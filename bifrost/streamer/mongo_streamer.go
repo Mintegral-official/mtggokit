@@ -152,8 +152,10 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 				ms.InfoStatus("LoadBase succ")
 			}
 		}
+		inc := time.After(time.Duration(ms.cfg.IncInterval) * time.Second)
+		base := time.After(time.Duration(ms.cfg.IncInterval) * time.Second)
+
 		for {
-			inc := time.After(time.Duration(ms.cfg.IncInterval) * time.Second)
 			select {
 			case <-ctx.Done():
 				ms.startTime = time.Now().UnixNano()
@@ -169,6 +171,17 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 				} else {
 					ms.InfoStatus("LoadInc Succ:")
 				}
+				inc = time.After(time.Duration(ms.cfg.IncInterval) * time.Second)
+			case <-base:
+				ms.startTime = time.Now().UnixNano()
+				err := ms.loadBase(ctx)
+				ms.endTime = time.Now().UnixNano()
+				if err != nil {
+					ms.WarnStatus("LoadBase Error:" + err.Error())
+				} else {
+					ms.InfoStatus("LoadBase Succ:")
+				}
+				base = time.After(time.Duration(ms.cfg.BaseInterval) * time.Second)
 			}
 		}
 	}()

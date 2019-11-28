@@ -9,6 +9,7 @@ type MongoStreamerCfg struct {
 	Name           string
 	UpdatMode      UpdatMode
 	IncInterval    int
+	BaseInterval   int
 	IsSync         bool
 	URI            string
 	DB             string

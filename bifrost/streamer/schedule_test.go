@@ -56,3 +56,20 @@ func TestSched_Schedule(t *testing.T) {
 		sched.Schedule(ctx)
 	})
 }
+
+func TestSelect(t *testing.T) {
+	inc := time.After(time.Second)
+	base := time.After(time.Second * 5)
+	for i := 0; i < 10; i++ {
+		select {
+		case <-inc:
+			fmt.Println("inc:", i)
+			inc = time.After(time.Second)
+		case <-base:
+			fmt.Println("base: ", i)
+			time.Sleep(time.Second * 2)
+			base = time.After(time.Second * 3)
+		}
+
+	}
+}
