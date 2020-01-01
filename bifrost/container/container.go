@@ -12,6 +12,9 @@ type Container interface {
 	Set(key MapKey, value interface{}) error
 	Del(key MapKey, value interface{})
 
+	Len() int
+	Range(f func(key, value interface{}) bool)
+
 	LoadBase(dataIter DataIterator) error
 	LoadInc(dataIter DataIterator) error
 }

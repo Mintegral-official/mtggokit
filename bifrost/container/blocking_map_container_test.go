@@ -10,6 +10,7 @@ func TestBlockingMapContainer_LoadBase(t *testing.T) {
 		bm := CreateBlockingMapContainer(1, 0)
 		convey.So(bm.LoadBase(NewTestDataIter([]string{})), convey.ShouldBeNil)
 		convey.So(bm.errorNum, convey.ShouldEqual, 0)
+		convey.So(bm.Len(), convey.ShouldEqual, 0)
 	})
 
 	convey.Convey("Test BufferedMapContainer Get", t, func() {
@@ -20,6 +21,9 @@ func TestBlockingMapContainer_LoadBase(t *testing.T) {
 		})), convey.ShouldBeNil)
 		convey.So(bm.errorNum, convey.ShouldEqual, 0)
 		convey.So(bm.innerData, convey.ShouldNotBeNil)
+
+		convey.So(bm.Len(), convey.ShouldEqual, 2)
+
 		v, e := bm.Get(StrKey("1"))
 		convey.So(e, convey.ShouldBeNil)
 		convey.So(v, convey.ShouldEqual, "2")
@@ -36,6 +40,7 @@ func TestBlockingMapContainer_LoadBase(t *testing.T) {
 			"4\tb",
 		})), convey.ShouldBeNil)
 		convey.So(bm.errorNum, convey.ShouldEqual, 0)
+		convey.So(bm.Len(), convey.ShouldEqual, 2)
 		v, e := bm.Get(I64Key(1))
 		convey.So(e, convey.ShouldBeNil)
 		convey.So(v, convey.ShouldEqual, "2")
@@ -54,6 +59,8 @@ func TestBlockingMapContainer_LoadBase(t *testing.T) {
 		})), convey.ShouldNotBeNil)
 		convey.So(bm.errorNum, convey.ShouldEqual, 1)
 		convey.So(bm.totalNum, convey.ShouldEqual, 3)
+		convey.So(bm.Len(), convey.ShouldEqual, 0)
+
 	})
 
 	convey.Convey("Test BufferedMapContainer Get", t, func() {
@@ -65,6 +72,7 @@ func TestBlockingMapContainer_LoadBase(t *testing.T) {
 		})), convey.ShouldBeNil)
 		convey.So(bm.errorNum, convey.ShouldEqual, 1)
 		convey.So(bm.totalNum, convey.ShouldEqual, 3)
+		convey.So(bm.Len(), convey.ShouldEqual, 2)
 
 		v, e := bm.Get(I64Key(1))
 		convey.So(e, convey.ShouldBeNil)
@@ -88,6 +96,8 @@ func TestBlockingMapContainer_LoadInc(t *testing.T) {
 		convey.So(bm.errorNum, convey.ShouldEqual, 1)
 		convey.So(bm.totalNum, convey.ShouldEqual, 3)
 
+		convey.So(bm.Len(), convey.ShouldEqual, 2)
+
 		v, e := bm.Get(I64Key(1))
 		convey.So(e, convey.ShouldBeNil)
 		convey.So(v, convey.ShouldEqual, "2")
@@ -103,6 +113,8 @@ func TestBlockingMapContainer_LoadInc(t *testing.T) {
 			})), convey.ShouldBeNil)
 			convey.So(bm.errorNum, convey.ShouldEqual, 2)
 			convey.So(bm.totalNum, convey.ShouldEqual, 5)
+			convey.So(bm.Len(), convey.ShouldEqual, 3)
+
 		})
 
 		convey.Convey("Test LoadInc Fail", func() {
@@ -112,6 +124,7 @@ func TestBlockingMapContainer_LoadInc(t *testing.T) {
 			})), convey.ShouldNotBeNil)
 			convey.So(bm.errorNum, convey.ShouldEqual, 3)
 			convey.So(bm.totalNum, convey.ShouldEqual, 5)
+			convey.So(bm.Len(), convey.ShouldEqual, 2)
 		})
 	})
 }

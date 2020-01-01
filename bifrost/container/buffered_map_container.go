@@ -55,3 +55,22 @@ func (bm *BufferedMapContainer) Del(key MapKey, value interface{}) {
 func (bm *BufferedMapContainer) LoadInc(iterator DataIterator) error {
 	return errors.New("not implement")
 }
+
+func (bm *BufferedMapContainer) Len() int {
+	if bm.innerData == nil {
+		return 0
+	}
+	return len(*bm.innerData)
+}
+
+func (bm *BufferedMapContainer) Range(f func(key, value interface{}) bool) {
+	if bm.innerData == nil {
+		return
+	}
+
+	for k, v := range *bm.innerData {
+		if !f(k, v) {
+			break
+		}
+	}
+}

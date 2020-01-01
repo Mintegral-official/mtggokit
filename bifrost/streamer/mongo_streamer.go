@@ -84,12 +84,10 @@ func (ms *MongoStreamer) GetSchedInfo() *SchedInfo {
 }
 
 func (ms *MongoStreamer) HasNext() bool {
-
 	return ms.curLen < len(ms.result) || ms.cursor.Next(context.Background())
 }
 
 func (ms *MongoStreamer) Next() (container.DataMode, container.MapKey, interface{}, error) {
-
 	ms.totalNum++
 	if ms.curLen < len(ms.result) {
 		r := ms.result[ms.curLen]
@@ -99,7 +97,6 @@ func (ms *MongoStreamer) Next() (container.DataMode, container.MapKey, interface
 		}
 		return r.DataMode, r.Key, r.Value, r.Err
 	}
-
 	if ms.cursor == nil {
 		ms.errorNum++
 		return container.DataModeAdd, nil, nil, errors.New("cursor is nil")
@@ -181,7 +178,9 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 				} else {
 					ms.InfoStatus("LoadBase Succ:")
 				}
-				base = time.After(time.Duration(ms.cfg.BaseInterval) * time.Second)
+				if ms.cfg.BaseInterval > 0 {
+					base = time.After(time.Duration(ms.cfg.BaseInterval)*time.Second + time.Microsecond)
+				}
 			}
 		}
 	}()
