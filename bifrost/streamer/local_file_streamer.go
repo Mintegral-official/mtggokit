@@ -130,7 +130,11 @@ func (fs *LocalFileStreamer) updateData(ctx context.Context) error {
 		if modTime.After(fs.modTime) {
 			fs.modTime = modTime
 			fs.scan = bufio.NewScanner(f)
-			return fs.container.LoadBase(fs)
+			err = fs.container.LoadBase(fs)
+			if fs.cfg.OnFinishBase != nil {
+				fs.cfg.OnFinishBase(fs)
+			}
+			return err
 		}
 	case Increment:
 	case DynInc:

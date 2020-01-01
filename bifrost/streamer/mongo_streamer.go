@@ -204,6 +204,9 @@ func (ms *MongoStreamer) loadBase(context.Context) error {
 	ms.cursor = cur
 	ms.curParser = ms.cfg.BaseParser
 	err = ms.container.LoadBase(ms)
+	if ms.cfg.OnFinishBase != nil {
+		ms.cfg.OnFinishBase(ms)
+	}
 	return err
 }
 
@@ -221,7 +224,11 @@ func (ms *MongoStreamer) loadInc(ctx context.Context) error {
 	}
 	ms.cursor = cur
 	ms.curParser = ms.cfg.IncParser
-	return ms.container.LoadInc(ms)
+	err = ms.container.LoadInc(ms)
+	if ms.cfg.OnFinishInc != nil {
+		ms.cfg.OnFinishInc(ms)
+	}
+	return err
 }
 
 func (ms *MongoStreamer) InfoStatus(s string) {

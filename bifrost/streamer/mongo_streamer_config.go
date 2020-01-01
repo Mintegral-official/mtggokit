@@ -24,5 +24,7 @@ type MongoStreamerCfg struct {
 	FindOpt        *options.FindOptions
 	OnBeforeBase   func(interface{}) interface{}
 	OnBeforeInc    func(interface{}) interface{}
+	OnFinishBase   func(streamer Streamer)
+	OnFinishInc    func(streamer Streamer)
 	Logger         log.BiLogger
 }
