@@ -150,7 +150,7 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 			}
 		}
 		inc := time.After(time.Duration(ms.cfg.IncInterval) * time.Second)
-		base := time.After(time.Duration(ms.cfg.IncInterval) * time.Second)
+		base := time.After(time.Duration(ms.cfg.BaseInterval) * time.Second)
 
 		for {
 			select {
