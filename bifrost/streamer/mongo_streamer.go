@@ -132,11 +132,10 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 		ms.endTime = time.Now().UnixNano()
 		if err != nil {
 			ms.WarnStatus("LoadBase error:" + err.Error())
-			return err
+		} else {
+			ms.InfoStatus("LoadBase Succ")
+			ms.hasInit = true
 		}
-		ms.InfoStatus("LoadBase Succ")
-		ms.hasInit = true
-
 	}
 	go func() {
 		ms.startTime = time.Now().UnixNano()
