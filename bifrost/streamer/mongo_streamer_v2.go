@@ -94,7 +94,7 @@ package streamer
 //
 //func (ms *MongoStreamerV2) UpdateData(ctx context.Context) error {
 //	if ms.hasInit && ms.cfg.IsSync {
-//		if err := ms.loadBase(ctx); err != nil {
+//		if err := ms.LoadBase(ctx); err != nil {
 //			ms.cfg.Logger.Warnf("streamer[%s] LoadBase error, totalNum[%d], errorNum[%d], userData[%s]", ms.cfg.Name, ms.totalNum, ms.errorNum, ms.cfg.UserData)
 //			return err
 //		} else {
@@ -104,7 +104,7 @@ package streamer
 //	}
 //	go func() {
 //		if ms.hasInit {
-//			if err := ms.loadBase(ctx); err != nil {
+//			if err := ms.LoadBase(ctx); err != nil {
 //				ms.cfg.Logger.Warnf("streamer[%s] LoadBase error, totalNum[%d], errorNum[%d], userData[%s]", ms.cfg.Name, ms.totalNum, ms.errorNum, ms.cfg.UserData)
 //			} else {
 //				ms.cfg.Logger.Infof("streamer[%s] LoadBase succ, totalNum[%d], errorNum[%d], userData[%s]", ms.cfg.Name, ms.totalNum, ms.errorNum, ms.cfg.UserData)
@@ -126,7 +126,7 @@ package streamer
 //	return nil
 //}
 //
-//func (ms *MongoStreamerV2) loadBase(ctx context.Context) error {
+//func (ms *MongoStreamerV2) LoadBase(ctx context.Context) error {
 //	ms.totalNum = 0
 //	ms.errorNum = 0
 //	query := ms.mgoCollection.Find(ms.cfg.BaseQuery)

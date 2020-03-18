@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"sync"
 	"time"
 )
 
@@ -26,6 +27,7 @@ type MongoStreamer struct {
 	findOpt    *options.FindOptions
 	startTime  int64
 	endTime    int64
+	locker     sync.Locker
 }
 
 func NewMongoStreamer(mongoConfig *MongoStreamerCfg) (*MongoStreamer, error) {
@@ -128,7 +130,7 @@ func (ms *MongoStreamer) Next() (container.DataMode, container.MapKey, interface
 func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 	ms.startTime = time.Now().UnixNano()
 	if !ms.hasInit && ms.cfg.IsSync {
-		err := ms.loadBase(ctx)
+		err := ms.LoadBase(ctx)
 		ms.endTime = time.Now().UnixNano()
 		if err != nil {
 			ms.WarnStatus("LoadBase error:" + err.Error())
@@ -140,7 +142,7 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 	go func() {
 		ms.startTime = time.Now().UnixNano()
 		if !ms.hasInit {
-			err := ms.loadBase(ctx)
+			err := ms.LoadBase(ctx)
 			ms.endTime = time.Now().UnixNano()
 			if err != nil {
 				ms.WarnStatus("LoadBase error:" + err.Error())
@@ -170,7 +172,7 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 				inc = time.After(time.Duration(ms.cfg.IncInterval) * time.Second)
 			case <-base:
 				ms.startTime = time.Now().UnixNano()
-				err := ms.loadBase(ctx)
+				err := ms.LoadBase(ctx)
 				ms.endTime = time.Now().UnixNano()
 				if err != nil {
 					ms.WarnStatus("LoadBase Error:" + err.Error())
@@ -186,7 +188,9 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 	return nil
 }
 
-func (ms *MongoStreamer) loadBase(context.Context) error {
+func (ms *MongoStreamer) LoadBase(context.Context) error {
+	ms.locker.Lock()
+	defer ms.locker.Lock()
 	ms.totalNum = 0
 	ms.errorNum = 0
 	if ms.cfg.OnBeforeBase != nil {
@@ -210,6 +214,8 @@ func (ms *MongoStreamer) loadBase(context.Context) error {
 }
 
 func (ms *MongoStreamer) loadInc(ctx context.Context) error {
+	ms.locker.Lock()
+	defer ms.locker.Lock()
 	if ms.cfg.OnBeforeInc != nil {
 		ms.cfg.IncQuery = ms.cfg.OnBeforeInc(ms.cfg.UserData)
 	}
