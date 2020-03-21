@@ -194,7 +194,7 @@ func (ms *MongoStreamer) loadBase(context.Context) error {
 	}
 	cur, err := ms.collection.Find(nil, ms.cfg.BaseQuery, ms.findOpt)
 	if err != nil {
-		return errors.Wrap(err, "FindError")
+		return errors.New("FindError, " + err.Error())
 	}
 
 	if ms.cursor != nil {
@@ -216,7 +216,7 @@ func (ms *MongoStreamer) loadInc(ctx context.Context) error {
 	c, _ := context.WithTimeout(ctx, time.Duration(ms.cfg.ReadTimeout)*time.Microsecond)
 	cur, err := ms.collection.Find(nil, ms.cfg.IncQuery, ms.cfg.FindOpt)
 	if err != nil {
-		return errors.Wrap(err, "FindError")
+		return errors.New("FindError: " + err.Error())
 	}
 	if ms.cursor != nil {
 		_ = ms.cursor.Close(c)
