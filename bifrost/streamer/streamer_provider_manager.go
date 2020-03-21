@@ -1,7 +1,7 @@
 package streamer
 
 import (
-	"github.com/pkg/errors"
+	"errors"
 )
 
 type StreamerProviderManager struct {

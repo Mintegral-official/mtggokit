@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/gob"
+	"errors"
 	"github.com/Mintegral-official/mtggokit/bifrost/container"
-	"github.com/pkg/errors"
 )
 
 type Status int

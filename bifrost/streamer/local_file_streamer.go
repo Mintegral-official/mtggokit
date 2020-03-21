@@ -3,9 +3,9 @@ package streamer
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/Mintegral-official/mtggokit/bifrost/container"
-	"github.com/pkg/errors"
 	"os"
 	"time"
 )

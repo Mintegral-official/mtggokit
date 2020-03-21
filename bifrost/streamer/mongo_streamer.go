@@ -2,9 +2,9 @@ package streamer
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/Mintegral-official/mtggokit/bifrost/container"
-	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"

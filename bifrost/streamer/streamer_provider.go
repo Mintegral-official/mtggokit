@@ -1,9 +1,9 @@
 package streamer
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Mintegral-official/mtggokit/bifrost/container"
-	"github.com/pkg/errors"
 	"sync"
 	"time"
 )

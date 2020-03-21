@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/Mintegral-official/mtggokit/bifrost"
 	"github.com/Mintegral-official/mtggokit/bifrost/container"
 	"github.com/Mintegral-official/mtggokit/bifrost/streamer"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"strconv"

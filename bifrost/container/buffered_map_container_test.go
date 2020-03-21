@@ -1,7 +1,7 @@
 package container
 
 import (
-	"github.com/pkg/errors"
+	"errors"
 	"github.com/smartystreets/goconvey/convey"
 	"strconv"
 	"strings"
