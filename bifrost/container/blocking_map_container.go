@@ -24,7 +24,7 @@ func CreateBlockingMapContainer(numPartision int, tolerate float64) *BlockingMap
 func (bm *BlockingMapContainer) Get(key MapKey) (interface{}, error) {
 	data, in := bm.innerData.Load(key.Value())
 	if !in {
-		return nil, errors.New("Not exist")
+		return nil, NotExistErr
 	}
 	return data, nil
 }

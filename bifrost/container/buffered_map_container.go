@@ -16,7 +16,7 @@ type BufferedMapContainer struct {
 func (bm *BufferedMapContainer) Get(key MapKey) (interface{}, error) {
 	data, in := (*bm.innerData)[key.Value()]
 	if !in {
-		return nil, errors.New("Not exist")
+		return nil, NotExistErr
 	}
 	return data, nil
 }
