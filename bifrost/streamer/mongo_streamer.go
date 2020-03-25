@@ -2,6 +2,7 @@ package streamer
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/Mintegral-official/mtggokit/bifrost/container"
@@ -12,20 +13,22 @@ import (
 )
 
 type MongoStreamer struct {
-	container  container.Container
-	cfg        *MongoStreamerCfg
-	hasInit    bool
-	totalNum   int64
-	errorNum   int64
-	curParser  DataParser
-	client     *mongo.Client
-	collection *mongo.Collection
-	cursor     *mongo.Cursor
-	result     []ParserResult
-	curLen     int
-	findOpt    *options.FindOptions
-	startTime  int64
-	endTime    int64
+	container    container.Container
+	cfg          *MongoStreamerCfg
+	hasInit      bool
+	totalNum     int
+	errorNum     int
+	curParser    DataParser
+	client       *mongo.Client
+	collection   *mongo.Collection
+	cursor       *mongo.Cursor
+	result       []ParserResult
+	curLen       int
+	findOpt      *options.FindOptions
+	lastBaseTime time.Time
+	lastIncTime  time.Time
+	baseTimeUsed time.Duration
+	incTimeUsed  time.Duration
 }
 
 func NewMongoStreamer(mongoConfig *MongoStreamerCfg) (*MongoStreamer, error) {
@@ -83,8 +86,8 @@ func (ms *MongoStreamer) GetSchedInfo() *SchedInfo {
 	}
 }
 
-func (ms *MongoStreamer) HasNext() bool {
-	return ms.curLen < len(ms.result) || ms.cursor.Next(context.Background())
+func (ms *MongoStreamer) HasNext() (bool, error) {
+	return ms.curLen < len(ms.result) || ms.cursor.Next(context.Background()), ms.cursor.Err()
 }
 
 func (ms *MongoStreamer) Next() (container.DataMode, container.MapKey, interface{}, error) {
@@ -126,10 +129,10 @@ func (ms *MongoStreamer) Next() (container.DataMode, container.MapKey, interface
 }
 
 func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
-	ms.startTime = time.Now().UnixNano()
+	ms.lastBaseTime = time.Now()
 	if !ms.hasInit && ms.cfg.IsSync {
 		err := ms.loadBase(ctx)
-		ms.endTime = time.Now().UnixNano()
+		ms.baseTimeUsed = time.Now().Sub(ms.lastBaseTime)
 		if err != nil {
 			ms.WarnStatus("LoadBase error:" + err.Error())
 		} else {
@@ -138,10 +141,10 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 		}
 	}
 	go func() {
-		ms.startTime = time.Now().UnixNano()
+		ms.lastBaseTime = time.Now()
 		if !ms.hasInit {
 			err := ms.loadBase(ctx)
-			ms.endTime = time.Now().UnixNano()
+			ms.baseTimeUsed = time.Now().Sub(ms.lastBaseTime)
 			if err != nil {
 				ms.WarnStatus("LoadBase error:" + err.Error())
 			} else {
@@ -154,14 +157,12 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 		for {
 			select {
 			case <-ctx.Done():
-				ms.startTime = time.Now().UnixNano()
-				ms.endTime = time.Now().UnixNano()
 				ms.InfoStatus("LoadInc Finish:")
 				return
 			case <-inc:
-				ms.startTime = time.Now().UnixNano()
+				ms.lastIncTime = time.Now()
 				err := ms.loadInc(ctx)
-				ms.endTime = time.Now().UnixNano()
+				ms.incTimeUsed = time.Now().Sub(ms.lastIncTime)
 				if err != nil {
 					ms.WarnStatus("LoadInc Error:" + err.Error())
 				} else {
@@ -169,9 +170,9 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 				}
 				inc = time.After(time.Duration(ms.cfg.IncInterval) * time.Second)
 			case <-base:
-				ms.startTime = time.Now().UnixNano()
+				ms.lastBaseTime = time.Now()
 				err := ms.loadBase(ctx)
-				ms.endTime = time.Now().UnixNano()
+				ms.baseTimeUsed = time.Now().Sub(ms.lastBaseTime)
 				if err != nil {
 					ms.WarnStatus("LoadBase Error:" + err.Error())
 				} else {
@@ -230,14 +231,32 @@ func (ms *MongoStreamer) loadInc(ctx context.Context) error {
 	return err
 }
 
+func (ms *MongoStreamer) GetInfo() *Info {
+	return &Info{
+		Name:         ms.cfg.Name,
+		TotalNum:     ms.container.Len(),
+		AddNum:       ms.totalNum,
+		ErrorNum:     ms.errorNum,
+		LastBaseTime: ms.lastBaseTime,
+		LastIncTime:  ms.lastIncTime,
+		BaseTimeUsed: ms.baseTimeUsed,
+		IncTimeUsed:  ms.incTimeUsed,
+	}
+}
+
 func (ms *MongoStreamer) InfoStatus(s string) {
 	if ms.cfg.Logger != nil {
-		ms.cfg.Logger.Infof("streamer[%s] %s, totalNum[%d], errorNum[%d], timeUsed[%d]", ms.cfg.Name, s, ms.totalNum, ms.errorNum, (ms.endTime-ms.startTime)/10e6)
+		ms.cfg.Logger.Infof("%s, streamInfo[%d]", ms.getInfoStr())
 	}
 }
 
 func (ms *MongoStreamer) WarnStatus(s string) {
 	if ms.cfg.Logger != nil {
-		ms.cfg.Logger.Warnf("streamer[%s] %s, totalNum[%d], errorNum[%d], timeUsed[%d]", ms.cfg.Name, s, ms.totalNum, ms.errorNum, (ms.endTime-ms.startTime)/10e6)
+		ms.cfg.Logger.Warnf("%s, streamInfo[%d]", ms.getInfoStr())
 	}
+}
+
+func (ms *MongoStreamer) getInfoStr() string {
+	data, _ := json.Marshal(ms.GetInfo())
+	return string(data)
 }

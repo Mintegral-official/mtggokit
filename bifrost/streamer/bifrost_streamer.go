@@ -51,8 +51,8 @@ func (bs *BifrostStreamer) GetSchedInfo() *SchedInfo {
 	}
 }
 
-func (bs *BifrostStreamer) HasNext() bool {
-	return bs.curIdx < len(bs.incRecords)
+func (bs *BifrostStreamer) HasNext() (bool, error) {
+	return bs.curIdx < len(bs.incRecords), nil
 }
 
 func (bs *BifrostStreamer) Next() (container.DataMode, container.MapKey, interface{}, error) {
@@ -161,12 +161,16 @@ func (bs *BifrostStreamer) loadInc(ctx context.Context) error {
 
 func (fs *BifrostStreamer) InfoStatus(s string) {
 	if fs.cfg.Logger != nil {
-		fs.cfg.Logger.Infof("streamer[%s] %s, totalNum[%d], errorNum[%d], userData[%s], timeUsed[%d]", fs.cfg.Name, s, fs.totalNum, fs.errorNum, fs.cfg.UserData, (fs.endTime-fs.startTime)/10e6)
+		fs.cfg.Logger.Infof("streamer[%s] %s, addNum[%d], errorNum[%d], userData[%s], timeUsed[%d]", fs.cfg.Name, s, fs.totalNum, fs.errorNum, fs.cfg.UserData, (fs.endTime-fs.startTime)/10e6)
 	}
 }
 
 func (fs *BifrostStreamer) WarnStatus(s string) {
 	if fs.cfg.Logger != nil {
-		fs.cfg.Logger.Warnf("streamer[%s] %s, totalNum[%d], errorNum[%d], userData[%s], timeUsed[%d]", fs.cfg.Name, s, fs.totalNum, fs.errorNum, fs.cfg.UserData, (fs.endTime-fs.startTime)/10e6)
+		fs.cfg.Logger.Warnf("streamer[%s] %s, addNum[%d], errorNum[%d], userData[%s], timeUsed[%d]", fs.cfg.Name, s, fs.totalNum, fs.errorNum, fs.cfg.UserData, (fs.endTime-fs.startTime)/10e6)
 	}
+}
+
+func (fs *BifrostStreamer) GetInfo() *Info {
+	return nil
 }

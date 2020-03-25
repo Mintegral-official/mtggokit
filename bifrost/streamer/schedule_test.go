@@ -31,6 +31,10 @@ func (fs *FakeSchedStreamer) GetSchedInfo() *SchedInfo {
 	return fs.SchedInfo
 }
 
+func (fs *FakeSchedStreamer) GetInfo() *Info {
+	return nil
+}
+
 func TestSched_Schedule(t *testing.T) {
 	convey.Convey("Test schedule", t, func() {
 		sched := Sched{}

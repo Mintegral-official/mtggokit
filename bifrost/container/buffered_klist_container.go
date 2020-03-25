@@ -2,6 +2,7 @@ package container
 
 import (
 	"errors"
+	"fmt"
 )
 
 // 双bufMap, 仅提供Get/LoadBase接口
@@ -21,10 +22,18 @@ func (bm *BufferedKListContainer) Get(key MapKey) (interface{}, error) {
 func (bm *BufferedKListContainer) LoadBase(iterator DataIterator) error {
 	bm.ErrorNum = 0
 	tmpM := make(map[interface{}][]interface{})
-	for iterator.HasNext() {
+	b, e := iterator.HasNext()
+	if e != nil {
+		return fmt.Errorf("LoadBase Error, err[%s]", e.Error())
+	}
+	for b {
 		_, k, v, e := iterator.Next()
 		if e != nil {
 			bm.ErrorNum++
+			b, e = iterator.HasNext()
+			if e != nil {
+				return fmt.Errorf("LoadBase Error, err[%s]", e.Error())
+			}
 			continue
 		}
 		res, in := tmpM[k.Value()]
@@ -33,6 +42,10 @@ func (bm *BufferedKListContainer) LoadBase(iterator DataIterator) error {
 			tmpM[k.Value()] = res
 		} else {
 			tmpM[k.Value()] = []interface{}{v}
+		}
+		b, e = iterator.HasNext()
+		if e != nil {
+			return fmt.Errorf("LoadBase Error, err[%s]", e.Error())
 		}
 	}
 	bm.innerData = &tmpM

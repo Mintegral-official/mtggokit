@@ -28,6 +28,10 @@ func (fs *FakeStreamer) UpdateData(ctx context.Context) error {
 	return nil
 }
 
+func (fs *FakeStreamer) GetInfo() *streamer.Info {
+	return nil
+}
+
 func TestLoader_Register(t *testing.T) {
 	convey.Convey("Test register duplicate name", t, func() {
 		bifrost := NewBifrost()

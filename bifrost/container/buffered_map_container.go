@@ -25,14 +25,26 @@ func (bm *BufferedMapContainer) LoadBase(iterator DataIterator) error {
 	bm.errorNum = 0
 	bm.totalNum = 0
 	tmpM := make(map[interface{}]interface{})
-	for iterator.HasNext() {
+	b, e := iterator.HasNext()
+	if e != nil {
+		return fmt.Errorf("LoadBase Error, err[%s]", e.Error())
+	}
+	for b {
 		_, k, v, e := iterator.Next()
 		bm.totalNum++
 		if e != nil {
 			bm.errorNum++
+			b, e = iterator.HasNext()
+			if e != nil {
+				return fmt.Errorf("LoadBase Error, err[%s]", e.Error())
+			}
 			continue
 		}
 		tmpM[k.Value()] = v
+		b, e = iterator.HasNext()
+		if e != nil {
+			return fmt.Errorf("LoadBase Error, err[%s]", e.Error())
+		}
 	}
 	if bm.totalNum == 0 {
 		bm.totalNum = 1

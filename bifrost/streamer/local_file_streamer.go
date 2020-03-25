@@ -3,6 +3,7 @@ package streamer
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/Mintegral-official/mtggokit/bifrost/container"
@@ -11,17 +12,17 @@ import (
 )
 
 type LocalFileStreamer struct {
-	container container.Container
-	cfg       *LocalFileStreamerCfg
-	scan      *bufio.Scanner
-	result    []ParserResult
-	curLen    int
-	hasInit   bool
-	modTime   time.Time
-	totalNum  int64
-	errorNum  int64
-	startTime int64
-	endTime   int64
+	container    container.Container
+	cfg          *LocalFileStreamerCfg
+	scan         *bufio.Scanner
+	result       []ParserResult
+	curLen       int
+	hasInit      bool
+	modTime      time.Time
+	addNum       int
+	errorNum     int
+	lastBaseTime time.Time
+	baseTimeUsed time.Duration
 }
 
 func NewFileStreamer(cfg *LocalFileStreamerCfg) *LocalFileStreamer {
@@ -45,12 +46,12 @@ func (fs *LocalFileStreamer) GetSchedInfo() *SchedInfo {
 	}
 }
 
-func (fs *LocalFileStreamer) HasNext() bool {
-	return fs.curLen < len(fs.result) || fs.scan != nil && fs.scan.Scan()
+func (fs *LocalFileStreamer) HasNext() (bool, error) {
+	return fs.curLen < len(fs.result) || fs.scan != nil && fs.scan.Scan(), nil
 }
 
 func (fs *LocalFileStreamer) Next() (container.DataMode, container.MapKey, interface{}, error) {
-	fs.totalNum++
+	fs.addNum++
 	if fs.curLen < len(fs.result) {
 		r := fs.result[fs.curLen]
 		fs.curLen++
@@ -80,9 +81,9 @@ func (fs *LocalFileStreamer) Next() (container.DataMode, container.MapKey, inter
 
 func (fs *LocalFileStreamer) UpdateData(ctx context.Context) error {
 	if fs.cfg.IsSync {
-		fs.startTime = time.Now().UnixNano()
+		fs.lastBaseTime = time.Now()
 		err := fs.updateData(ctx)
-		fs.endTime = time.Now().UnixNano()
+		fs.baseTimeUsed = time.Now().Sub(fs.lastBaseTime)
 		if err != nil {
 			fs.WarnStatus("LoadBase error: " + err.Error())
 			return err
@@ -96,9 +97,9 @@ func (fs *LocalFileStreamer) UpdateData(ctx context.Context) error {
 			case <-ctx.Done():
 				return
 			case <-inc:
-				fs.startTime = time.Now().UnixNano()
+				fs.lastBaseTime = time.Now()
 				err := fs.updateData(ctx)
-				fs.endTime = time.Now().UnixNano()
+				fs.baseTimeUsed = time.Now().Sub(fs.lastBaseTime)
 				if err != nil {
 					fs.WarnStatus("LoadBase error: " + err.Error())
 				} else {
@@ -111,15 +112,13 @@ func (fs *LocalFileStreamer) UpdateData(ctx context.Context) error {
 }
 
 func (fs *LocalFileStreamer) updateData(ctx context.Context) error {
-
 	switch fs.cfg.UpdatMode {
 	case Static, Dynamic:
-		fs.totalNum = 0
+		fs.addNum = 0
 		fs.errorNum = 0
 		if fs.hasInit && fs.cfg.UpdatMode == Static {
 			return nil
 		}
-
 		f, err := os.Open(fs.cfg.Path)
 		defer func() { _ = f.Close() }()
 		if err != nil {
@@ -144,14 +143,30 @@ func (fs *LocalFileStreamer) updateData(ctx context.Context) error {
 	return nil
 }
 
-func (ms *LocalFileStreamer) InfoStatus(s string) {
-	if ms.cfg.Logger != nil {
-		ms.cfg.Logger.Infof("streamer[%s] %s, totalNum[%d], errorNum[%d], timeUsed[%d]", ms.cfg.Name, s, ms.totalNum, ms.errorNum, (ms.endTime-ms.startTime)/10e6)
+func (fs *LocalFileStreamer) InfoStatus(s string) {
+	if fs.cfg.Logger != nil {
+		fs.cfg.Logger.Infof("%s, streamerInfo[%s]", fs.getInfoStr())
 	}
 }
 
-func (ms *LocalFileStreamer) WarnStatus(s string) {
-	if ms.cfg.Logger != nil {
-		ms.cfg.Logger.Warnf("streamer[%s] %s, totalNum[%d], errorNum[%d], timeUsed[%d]", ms.cfg.Name, s, ms.totalNum, ms.errorNum, (ms.endTime-ms.startTime)/10e6)
+func (fs *LocalFileStreamer) WarnStatus(s string) {
+	if fs.cfg.Logger != nil {
+		fs.cfg.Logger.Warnf(" %s, streamerInfo[%s]", fs.getInfoStr())
 	}
+}
+
+func (fs *LocalFileStreamer) GetInfo() *Info {
+	return &Info{
+		Name:         fs.cfg.Name,
+		TotalNum:     fs.container.Len(),
+		AddNum:       fs.addNum,
+		ErrorNum:     fs.errorNum,
+		LastBaseTime: fs.lastBaseTime,
+		BaseTimeUsed: fs.baseTimeUsed,
+	}
+}
+
+func (fs *LocalFileStreamer) getInfoStr() string {
+	data, _ := json.Marshal(fs.GetInfo())
+	return string(data)
 }

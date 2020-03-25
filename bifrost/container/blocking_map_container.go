@@ -42,11 +42,20 @@ func (bm *BlockingMapContainer) LoadBase(iterator DataIterator) error {
 	tmpM := &sync.Map{}
 	bm.errorNum = 0
 	bm.totalNum = 0
-	for iterator.HasNext() {
+
+	b, e := iterator.HasNext()
+	if e != nil {
+		return fmt.Errorf("LoadBase Error, err[%s]", e.Error())
+	}
+	for b {
 		m, k, v, e := iterator.Next()
 		bm.totalNum++
 		if e != nil {
 			bm.errorNum++
+			b, e = iterator.HasNext()
+			if e != nil {
+				return fmt.Errorf("LoadBase Error, err[%s]", e.Error())
+			}
 			continue
 		}
 		switch m {
@@ -54,6 +63,10 @@ func (bm *BlockingMapContainer) LoadBase(iterator DataIterator) error {
 			tmpM.Store(k.Value(), v)
 		case DataModeDel:
 			tmpM.Delete(k.Value())
+		}
+		b, e = iterator.HasNext()
+		if e != nil {
+			return fmt.Errorf("LoadBase Error, err[%s]", e.Error())
 		}
 	}
 	if bm.totalNum == 0 {
@@ -68,11 +81,19 @@ func (bm *BlockingMapContainer) LoadBase(iterator DataIterator) error {
 }
 
 func (bm *BlockingMapContainer) LoadInc(iterator DataIterator) error {
-	for iterator.HasNext() {
+	b, e := iterator.HasNext()
+	if e != nil {
+		return fmt.Errorf("LoadInc Error, err[%s]", e.Error())
+	}
+	for b {
 		m, k, v, e := iterator.Next()
 		bm.totalNum++
 		if e != nil {
 			bm.errorNum++
+			b, e = iterator.HasNext()
+			if e != nil {
+				return fmt.Errorf("LoadBase Error, err[%s]", e.Error())
+			}
 			continue
 		}
 		switch m {
@@ -80,6 +101,10 @@ func (bm *BlockingMapContainer) LoadInc(iterator DataIterator) error {
 			bm.innerData.Store(k.Value(), v)
 		case DataModeDel:
 			bm.Del(k, v)
+		}
+		b, e = iterator.HasNext()
+		if e != nil {
+			return fmt.Errorf("LoadInc Error, err[%s]", e.Error())
 		}
 	}
 	if bm.totalNum == 0 {

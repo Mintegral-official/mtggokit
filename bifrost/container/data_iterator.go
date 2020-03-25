@@ -9,6 +9,6 @@ const (
 )
 
 type DataIterator interface {
-	HasNext() bool
+	HasNext() (bool, error)
 	Next() (DataMode, MapKey, interface{}, error)
 }

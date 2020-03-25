@@ -20,8 +20,8 @@ func NewTestDataIter(data []string) *TestDataIter {
 	}
 }
 
-func (this *TestDataIter) HasNext() bool {
-	return this.current < len(this.data)
+func (this *TestDataIter) HasNext() (bool, error) {
+	return this.current < len(this.data), nil
 }
 
 func (this *TestDataIter) Next() (DataMode, MapKey, interface{}, error) {
@@ -49,8 +49,8 @@ func NewTestIntDataIter(data []string) *TestIntDataIter {
 	}
 }
 
-func (this *TestIntDataIter) HasNext() bool {
-	return this.current < len(this.data)
+func (this *TestIntDataIter) HasNext() (bool, error) {
+	return this.current < len(this.data), nil
 }
 
 func (this *TestIntDataIter) Next() (DataMode, MapKey, interface{}, error) {
