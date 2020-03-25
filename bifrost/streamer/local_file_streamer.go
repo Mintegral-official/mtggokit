@@ -151,7 +151,7 @@ func (fs *LocalFileStreamer) InfoStatus(s string) {
 
 func (fs *LocalFileStreamer) WarnStatus(s string) {
 	if fs.cfg.Logger != nil {
-		fs.cfg.Logger.Warnf(" %s, streamerInfo[%s]", s, fs.getInfoStr())
+		fs.cfg.Logger.Warnf("%s, streamerInfo[%s]", s, fs.getInfoStr())
 	}
 }
 

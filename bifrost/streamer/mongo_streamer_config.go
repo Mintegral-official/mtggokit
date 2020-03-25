@@ -7,10 +7,11 @@ import (
 
 type MongoStreamerCfg struct {
 	Name           string
-	UpdatMode      UpdatMode
+	UpdateMode     UpdatMode
 	IncInterval    int
 	BaseInterval   int
 	IsSync         bool
+	TryTimes       int
 	URI            string
 	DB             string
 	Collection     string

@@ -10,7 +10,7 @@ func TestNewMongoStreamer(t *testing.T) {
 	convey.Convey("", t, func() {
 		ms, err := NewMongoStreamer(&MongoStreamerCfg{
 			Name:           "mongo_test",
-			UpdatMode:      Dynamic,
+			UpdateMode:     Dynamic,
 			IncInterval:    60,
 			IsSync:         true,
 			URI:            "mongodb://127.0.0.1:21017",

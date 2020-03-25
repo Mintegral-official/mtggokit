@@ -44,7 +44,7 @@ func (cp *CampaignParser) Parse(data []byte, userData interface{}) []streamer.Pa
 func main() {
 	ms, err := streamer.NewMongoStreamer(&streamer.MongoStreamerCfg{
 		Name:           "mongo_test",
-		UpdatMode:      streamer.Dynamic,
+		UpdateMode:     streamer.Dynamic,
 		IncInterval:    5,
 		IsSync:         true,
 		URI:            "mongodb://13.250.108.190:27017",

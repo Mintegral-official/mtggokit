@@ -194,12 +194,28 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 	return nil
 }
 
-func (ms *MongoStreamer) loadBase(context.Context) error {
-	ms.totalNum = 0
-	ms.errorNum = 0
+func (ms *MongoStreamer) loadBase(ctx context.Context) (err error) {
+	for i := 0; i < ms.cfg.TryTimes; i++ {
+		err = ms.loadBase2(ctx)
+		if err == nil {
+			return nil
+		} else {
+			ms.cfg.Logger.Warnf("LoadBase error[%s], tryTimes[%d]", err, i)
+		}
+	}
+	return
+}
+
+func (ms *MongoStreamer) loadBase2(context.Context) error {
+
 	if ms.cfg.OnBeforeBase != nil {
 		ms.cfg.BaseQuery = ms.cfg.OnBeforeBase(ms.cfg.UserData)
+		if ms.cfg.BaseQuery == nil {
+			return nil
+		}
 	}
+	ms.totalNum = 0
+	ms.errorNum = 0
 	cur, err := ms.collection.Find(nil, ms.cfg.BaseQuery, ms.findOpt)
 	if err != nil {
 		return errors.New("FindError, " + err.Error())
@@ -220,6 +236,9 @@ func (ms *MongoStreamer) loadBase(context.Context) error {
 func (ms *MongoStreamer) loadInc(ctx context.Context) error {
 	if ms.cfg.OnBeforeInc != nil {
 		ms.cfg.IncQuery = ms.cfg.OnBeforeInc(ms.cfg.UserData)
+		if ms.cfg.IncQuery == nil {
+			return nil
+		}
 	}
 	c, _ := context.WithTimeout(ctx, time.Duration(ms.cfg.ReadTimeout)*time.Microsecond)
 	cur, err := ms.collection.Find(nil, ms.cfg.IncQuery, ms.cfg.FindOpt)
@@ -253,13 +272,13 @@ func (ms *MongoStreamer) GetInfo() *Info {
 
 func (ms *MongoStreamer) InfoStatus(s string) {
 	if ms.cfg.Logger != nil {
-		ms.cfg.Logger.Infof("%s, streamInfo[%s]", s, ms.getInfoStr())
+		ms.cfg.Logger.Infof("%s, streamInfo[%d]", ms.getInfoStr())
 	}
 }
 
 func (ms *MongoStreamer) WarnStatus(s string) {
 	if ms.cfg.Logger != nil {
-		ms.cfg.Logger.Warnf("%s, streamInfo[%s]", s, ms.getInfoStr())
+		ms.cfg.Logger.Warnf("%s, streamInfo[%d]", ms.getInfoStr())
 	}
 }
 

@@ -158,7 +158,7 @@ func getCampaignInfoStreamer(bf *bifrost.Bifrost, ud *UserData) streamer.Streame
 	// 创建 campaignInfo Streamer
 	ms, err := streamer.NewMongoStreamer(&streamer.MongoStreamerCfg{
 		Name:           "campaignsInfo",
-		UpdatMode:      streamer.Dynamic,
+		UpdateMode:     streamer.Dynamic,
 		IncInterval:    5,
 		IsSync:         true,
 		URI:            "mongodb://13.250.108.190:27017",
@@ -216,7 +216,7 @@ func getCreativeStreamer(bf *bifrost.Bifrost, ud *UserData) streamer.Streamer {
 	// 创建 creative Streamer
 	ms, err := streamer.NewMongoStreamer(&streamer.MongoStreamerCfg{
 		Name:           "creativeInfo",
-		UpdatMode:      streamer.Dynamic,
+		UpdateMode:     streamer.Dynamic,
 		IncInterval:    5,
 		IsSync:         true,
 		URI:            "mongodb://13.250.108.190:27017",
@@ -278,7 +278,7 @@ func getAdxAuditCreativeStreamer(ud *UserData) streamer.Streamer {
 	// 创建 creative Streamer
 	ms, err := streamer.NewMongoStreamer(&streamer.MongoStreamerCfg{
 		Name:           "adxAuditCreativeInfo",
-		UpdatMode:      streamer.Dynamic,
+		UpdateMode:     streamer.Dynamic,
 		IncInterval:    5,
 		IsSync:         true,
 		URI:            "mongodb://47.252.0.66:27050",
