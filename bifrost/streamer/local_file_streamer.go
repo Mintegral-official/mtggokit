@@ -145,13 +145,13 @@ func (fs *LocalFileStreamer) updateData(ctx context.Context) error {
 
 func (fs *LocalFileStreamer) InfoStatus(s string) {
 	if fs.cfg.Logger != nil {
-		fs.cfg.Logger.Infof("%s, streamerInfo[%s]", fs.getInfoStr())
+		fs.cfg.Logger.Infof("%s, streamerInfo[%s]", s, fs.getInfoStr())
 	}
 }
 
 func (fs *LocalFileStreamer) WarnStatus(s string) {
 	if fs.cfg.Logger != nil {
-		fs.cfg.Logger.Warnf(" %s, streamerInfo[%s]", fs.getInfoStr())
+		fs.cfg.Logger.Warnf(" %s, streamerInfo[%s]", s, fs.getInfoStr())
 	}
 }
 
