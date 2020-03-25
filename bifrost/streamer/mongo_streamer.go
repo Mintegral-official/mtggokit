@@ -195,12 +195,12 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 }
 
 func (ms *MongoStreamer) loadBase(ctx context.Context) (err error) {
-	for i := 0; i < ms.cfg.TryTimes; i++ {
+	for i := -1; i < ms.cfg.TryTimes; i++ {
 		err = ms.loadBase2(ctx)
 		if err == nil {
 			return nil
 		} else {
-			ms.cfg.Logger.Warnf("LoadBase error[%s], tryTimes[%d]", err, i)
+			ms.cfg.Logger.Warnf("LoadBase error[%s], tryTimes[%d]", err, i+1)
 		}
 	}
 	return
@@ -272,13 +272,13 @@ func (ms *MongoStreamer) GetInfo() *Info {
 
 func (ms *MongoStreamer) InfoStatus(s string) {
 	if ms.cfg.Logger != nil {
-		ms.cfg.Logger.Infof("%s, streamInfo[%d]", ms.getInfoStr())
+		ms.cfg.Logger.Infof("%s, streamInfo[%d]", s, ms.getInfoStr())
 	}
 }
 
 func (ms *MongoStreamer) WarnStatus(s string) {
 	if ms.cfg.Logger != nil {
-		ms.cfg.Logger.Warnf("%s, streamInfo[%d]", ms.getInfoStr())
+		ms.cfg.Logger.Warnf("%s, streamInfo[%d]", s, ms.getInfoStr())
 	}
 }
 
