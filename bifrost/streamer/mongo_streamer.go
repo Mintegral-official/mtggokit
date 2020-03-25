@@ -87,7 +87,14 @@ func (ms *MongoStreamer) GetSchedInfo() *SchedInfo {
 }
 
 func (ms *MongoStreamer) HasNext() (bool, error) {
-	return ms.curLen < len(ms.result) || ms.cursor.Next(context.Background()), ms.cursor.Err()
+	if ms.curLen < len(ms.result) {
+		return true, nil
+	}
+	if ms.cursor.Next(context.Background()) {
+		return true, nil
+	} else {
+		return false, ms.cursor.Err()
+	}
 }
 
 func (ms *MongoStreamer) Next() (container.DataMode, container.MapKey, interface{}, error) {
