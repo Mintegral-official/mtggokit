@@ -253,13 +253,13 @@ func (ms *MongoStreamer) GetInfo() *Info {
 
 func (ms *MongoStreamer) InfoStatus(s string) {
 	if ms.cfg.Logger != nil {
-		ms.cfg.Logger.Infof("%s, streamInfo[%d]", s, ms.getInfoStr())
+		ms.cfg.Logger.Infof("%s, streamInfo[%s]", s, ms.getInfoStr())
 	}
 }
 
 func (ms *MongoStreamer) WarnStatus(s string) {
 	if ms.cfg.Logger != nil {
-		ms.cfg.Logger.Warnf("%s, streamInfo[%d]", s, ms.getInfoStr())
+		ms.cfg.Logger.Warnf("%s, streamInfo[%s]", s, ms.getInfoStr())
 	}
 }
 
