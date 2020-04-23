@@ -14,7 +14,9 @@ import (
 type LocalFileStreamer struct {
 	container    container.Container
 	cfg          *LocalFileStreamerCfg
-	scan         *bufio.Scanner
+	fileReader   *bufio.Reader
+	line         string
+	eof          bool
 	result       []ParserResult
 	curLen       int
 	hasInit      bool
@@ -47,7 +49,37 @@ func (fs *LocalFileStreamer) GetSchedInfo() *SchedInfo {
 }
 
 func (fs *LocalFileStreamer) HasNext() (bool, error) {
-	return fs.curLen < len(fs.result) || fs.scan != nil && fs.scan.Scan(), nil
+	var hasNext bool
+	if fs.eof {
+		return fs.curLen < len(fs.result), nil
+	}
+	line, err := fs.readLn(fs.fileReader)
+	if isEof := fs.isEof(err); err == nil || isEof {
+		fs.line = line
+		hasNext = true
+		fs.eof = isEof
+	}
+	return fs.curLen < len(fs.result) || hasNext, nil
+}
+
+func (fs *LocalFileStreamer) readLn(r *bufio.Reader) (string, error) {
+	var (
+		isPrefix       = true
+		err      error = nil
+		line, ln []byte
+	)
+	for isPrefix && err == nil {
+		line, isPrefix, err = r.ReadLine()
+		ln = append(ln, line...)
+	}
+	return string(ln), err
+}
+
+func (fs *LocalFileStreamer) isEof(err error) bool {
+	if err != nil {
+		return err.Error() == "EOF"
+	}
+	return false
 }
 
 func (fs *LocalFileStreamer) Next() (container.DataMode, container.MapKey, interface{}, error) {
@@ -60,7 +92,7 @@ func (fs *LocalFileStreamer) Next() (container.DataMode, container.MapKey, inter
 		}
 		return r.DataMode, r.Key, r.Value, r.Err
 	}
-	result := fs.cfg.DataParser.Parse([]byte(fs.scan.Text()), nil)
+	result := fs.cfg.DataParser.Parse([]byte(fs.line), nil)
 	if result == nil {
 		fs.errorNum++
 		return container.DataModeAdd, nil, nil, errors.New(fmt.Sprintf("Parser error"))
@@ -128,7 +160,7 @@ func (fs *LocalFileStreamer) updateData(ctx context.Context) error {
 		modTime := stat.ModTime()
 		if modTime.After(fs.modTime) {
 			fs.modTime = modTime
-			fs.scan = bufio.NewScanner(f)
+			fs.fileReader = bufio.NewReader(f)
 			err = fs.container.LoadBase(fs)
 			if fs.cfg.OnFinishBase != nil {
 				fs.cfg.OnFinishBase(fs)
