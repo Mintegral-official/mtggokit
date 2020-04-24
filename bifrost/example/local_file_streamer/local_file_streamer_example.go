@@ -12,9 +12,8 @@ import (
 
 func main() {
 	lfs := streamer.NewFileStreamer(&streamer.LocalFileStreamerCfg{
-		Name: "campaign_list.txt",
-		//Path: "/Users/mingfei/gitproject/mtggokit_fork/bifrost/example/local_file_streamer/campaign_list.txt",
-		Path:       "/Users/mingfei/gitproject/mtggokit_fork/bifrost/example/local_file_streamer/campaign_list_bug.txt",
+		Name:       "campaign_list.txt",
+		Path:       "bifrost/data/campaign_list_bug.txt",
 		UpdatMode:  streamer.Dynamic,
 		Interval:   5,
 		IsSync:     true,
