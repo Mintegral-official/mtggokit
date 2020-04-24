@@ -54,6 +54,10 @@ func (fs *LocalFileStreamer) HasNext() (bool, error) {
 		return fs.curLen < len(fs.result), nil
 	}
 	line, err := fs.readLn(fs.fileReader)
+	for err == nil && len(line) == 0 {
+		line, err = fs.readLn(fs.fileReader)
+	}
+
 	if isEof := fs.isEof(err); err == nil || isEof {
 		fs.line = line
 		hasNext = true

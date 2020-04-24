@@ -35,7 +35,7 @@ func main() {
 
 	value, err := lfs.GetContainer().Get(container.StrKey("CampaignList"))
 	if err == nil {
-		fmt.Println(value)
+		//fmt.Println(value)
 	}
 	value, err = lfs.GetContainer().Get(container.StrKey("2_TV"))
 	if err == nil {
