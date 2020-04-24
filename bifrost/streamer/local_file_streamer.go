@@ -49,21 +49,25 @@ func (fs *LocalFileStreamer) GetSchedInfo() *SchedInfo {
 }
 
 func (fs *LocalFileStreamer) HasNext() (bool, error) {
-	var hasNext bool
-	if fs.eof {
-		return fs.curLen < len(fs.result), nil
+	if fs.curLen < len(fs.result) {
+		return true, nil
 	}
 	line, err := fs.readLn(fs.fileReader)
 	for err == nil && len(line) == 0 {
 		line, err = fs.readLn(fs.fileReader)
 	}
 
-	if isEof := fs.isEof(err); err == nil || isEof {
+	if err == nil {
 		fs.line = line
-		hasNext = true
-		fs.eof = isEof
+		return true, nil
 	}
-	return fs.curLen < len(fs.result) || hasNext, nil
+
+	if fs.isEof(err) {
+		fs.eof = true
+		return false, nil
+	}
+
+	return false, err
 }
 
 func (fs *LocalFileStreamer) readLn(r *bufio.Reader) ([]byte, error) {
@@ -96,7 +100,7 @@ func (fs *LocalFileStreamer) Next() (container.DataMode, container.MapKey, inter
 		}
 		return r.DataMode, r.Key, r.Value, r.Err
 	}
-	result := fs.cfg.DataParser.Parse([]byte(fs.line), nil)
+	result := fs.cfg.DataParser.Parse(fs.line, nil)
 	if result == nil {
 		fs.errorNum++
 		return container.DataModeAdd, nil, nil, errors.New(fmt.Sprintf("Parser error"))

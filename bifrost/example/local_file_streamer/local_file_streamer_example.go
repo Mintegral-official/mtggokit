@@ -21,7 +21,7 @@ func main() {
 		Logger:     logrus.New(),
 	})
 	lfs.SetContainer(&container.BufferedMapContainer{
-		Tolerate: 0.5,
+		Tolerate: 0.001,
 	})
 	if lfs == nil {
 		fmt.Println("Init local file streamer error!")

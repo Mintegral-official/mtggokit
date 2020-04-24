@@ -71,7 +71,7 @@ func main() {
 		fmt.Println("streamer init err")
 		return
 	}
-	ms.SetContainer(container.CreateBlockingMapContainer(100, 0))
+	ms.SetContainer(container.CreateBlockingMapContainer(100, 0.001))
 
 	if err != nil {
 		fmt.Println("Init mongo streamer error! err=" + err.Error())
