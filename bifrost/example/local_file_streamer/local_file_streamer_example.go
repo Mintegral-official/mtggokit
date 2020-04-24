@@ -12,8 +12,9 @@ import (
 
 func main() {
 	lfs := streamer.NewFileStreamer(&streamer.LocalFileStreamerCfg{
-		Name:       "test1",
-		Path:       "test.txt",
+		Name: "campaign_list.txt",
+		//Path: "/Users/mingfei/gitproject/mtggokit_fork/bifrost/example/local_file_streamer/campaign_list.txt",
+		Path:       "/Users/mingfei/gitproject/mtggokit_fork/bifrost/example/local_file_streamer/campaign_list_bug.txt",
 		UpdatMode:  streamer.Dynamic,
 		Interval:   5,
 		IsSync:     true,
@@ -33,7 +34,11 @@ func main() {
 	signal.Notify(c)
 	_ = lfs.UpdateData(ctx)
 
-	value, err := lfs.GetContainer().Get(container.StrKey("abc"))
+	value, err := lfs.GetContainer().Get(container.StrKey("CampaignList"))
+	if err == nil {
+		fmt.Println(value)
+	}
+	value, err = lfs.GetContainer().Get(container.StrKey("2_TV"))
 	if err == nil {
 		fmt.Println(value)
 	}
