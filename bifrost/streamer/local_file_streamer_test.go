@@ -37,7 +37,7 @@ func TestLocalFileStreamer_UpdateData(t *testing.T) {
 		lfs := NewFileStreamer(&LocalFileStreamerCfg{
 			Name:       "test1",
 			Path:       filename,
-			UpdatMode:  Dynamic,
+			UpdateMode: Dynamic,
 			Interval:   1,
 			IsSync:     true,
 			DataParser: &DefaultTextParser{},

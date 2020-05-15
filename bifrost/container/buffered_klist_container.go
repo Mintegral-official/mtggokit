@@ -11,6 +11,10 @@ type BufferedKListContainer struct {
 	ErrorNum  int
 }
 
+func CreateBufferedKListContainer() *BufferedKListContainer {
+	return &BufferedKListContainer{}
+}
+
 func (bm *BufferedKListContainer) Get(key MapKey) (interface{}, error) {
 	data, in := (*bm.innerData)[key.Value()]
 	if !in {

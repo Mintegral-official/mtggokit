@@ -14,7 +14,7 @@ func main() {
 	lfs := streamer.NewFileStreamer(&streamer.LocalFileStreamerCfg{
 		Name:       "campaign_list.txt",
 		Path:       "bifrost/data/campaign_list_bug.txt",
-		UpdatMode:  streamer.Dynamic,
+		UpdateMode: streamer.Dynamic,
 		Interval:   5,
 		IsSync:     true,
 		DataParser: &streamer.DefaultTextParser{},

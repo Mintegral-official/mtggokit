@@ -50,7 +50,7 @@ func TestBufferedKListContainer(t *testing.T) {
 	})
 
 	convey.Convey("Test BufferedMapContainer Get", t, func() {
-		bm := BufferedKListContainer{}
+		bm := CreateBufferedKListContainer()
 		convey.So(bm.LoadBase(NewTestDataIter([]string{
 			"1\t2",
 			"a\tb",
