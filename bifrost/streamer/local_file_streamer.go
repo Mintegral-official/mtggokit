@@ -152,7 +152,7 @@ func (fs *LocalFileStreamer) UpdateData(ctx context.Context) error {
 }
 
 func (fs *LocalFileStreamer) updateData(ctx context.Context) error {
-	switch fs.cfg.UpdateMode {
+	switch fs.cfg.UpdatMode {
 	case Static, Dynamic:
 		if fs.cfg.OnBeforeBase != nil {
 			err := fs.cfg.OnBeforeBase(fs)
@@ -162,7 +162,7 @@ func (fs *LocalFileStreamer) updateData(ctx context.Context) error {
 		}
 		fs.addNum = 0
 		fs.errorNum = 0
-		if fs.hasInit && fs.cfg.UpdateMode == Static {
+		if fs.hasInit && fs.cfg.UpdatMode == Static {
 			return nil
 		}
 		f, err := os.Open(fs.cfg.Path)
@@ -184,7 +184,7 @@ func (fs *LocalFileStreamer) updateData(ctx context.Context) error {
 	case Increment:
 	case DynInc:
 	default:
-		return errors.New("not support mode[" + fs.cfg.UpdateMode.toString() + "]")
+		return errors.New("not support mode[" + fs.cfg.UpdatMode.toString() + "]")
 	}
 	return nil
 }

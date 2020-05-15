@@ -134,7 +134,7 @@ func getCampaigIdsStreamer() streamer.Streamer {
 	lfs := streamer.NewFileStreamer(&streamer.LocalFileStreamerCfg{
 		Name:       "campaignsIds",
 		Path:       "bifrost/data/caimpaigns.txt",
-		UpdateMode: streamer.Dynamic,
+		UpdatMode:  streamer.Dynamic,
 		Interval:   5,
 		IsSync:     true,
 		DataParser: &CampaignIdsParser{},
