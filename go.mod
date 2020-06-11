@@ -8,7 +8,7 @@ require (
 	github.com/panjf2000/ants v1.2.0
 	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.4.2
-	github.com/smallnest/rpcx v0.0.0-20191122154842-3a499652de56
+	github.com/smallnest/rpcx v0.0.0-20200104074109-4f758db059eb
 	github.com/smartystreets/assertions v1.0.1
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/vmihailenco/msgpack v4.0.4+incompatible
