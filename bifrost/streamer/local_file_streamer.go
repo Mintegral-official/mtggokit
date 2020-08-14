@@ -154,12 +154,6 @@ func (fs *LocalFileStreamer) UpdateData(ctx context.Context) error {
 func (fs *LocalFileStreamer) updateData(ctx context.Context) error {
 	switch fs.cfg.UpdatMode {
 	case Static, Dynamic:
-		if fs.cfg.OnBeforeBase != nil {
-			err := fs.cfg.OnBeforeBase(fs)
-			if err != nil {
-				return fmt.Errorf("OnBeforeBase Error: " + err.Error())
-			}
-		}
 		fs.addNum = 0
 		fs.errorNum = 0
 		if fs.hasInit && fs.cfg.UpdatMode == Static {
@@ -175,6 +169,12 @@ func (fs *LocalFileStreamer) updateData(ctx context.Context) error {
 		if modTime.After(fs.modTime) {
 			fs.modTime = modTime
 			fs.fileReader = bufio.NewReader(f)
+			if fs.cfg.OnBeforeBase != nil {
+				err := fs.cfg.OnBeforeBase(fs)
+				if err != nil {
+					return fmt.Errorf("OnBeforeBase Error: " + err.Error())
+				}
+			}
 			err = fs.container.LoadBase(fs)
 			if fs.cfg.OnFinishBase != nil {
 				fs.cfg.OnFinishBase(fs)
