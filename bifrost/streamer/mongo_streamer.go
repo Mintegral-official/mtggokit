@@ -207,6 +207,13 @@ func (ms *MongoStreamer) loadBase(ctx context.Context) (err error) {
 }
 
 func (ms *MongoStreamer) loadBase2(context.Context) error {
+
+	if ms.cfg.OnBeforeBase != nil {
+		ms.cfg.BaseQuery = ms.cfg.OnBeforeBase(ms.cfg.UserData)
+		if ms.cfg.BaseQuery == nil {
+			return nil
+		}
+	}
 	ms.totalNum = 0
 	ms.errorNum = 0
 	cur, err := ms.collection.Find(nil, ms.cfg.BaseQuery, ms.findOpt)
@@ -218,12 +225,6 @@ func (ms *MongoStreamer) loadBase2(context.Context) error {
 		_ = ms.cursor.Close(nil)
 	}
 	ms.cursor = cur
-	if ms.cfg.OnBeforeBase != nil {
-		ms.cfg.BaseQuery = ms.cfg.OnBeforeBase(ms.cfg.UserData)
-		if ms.cfg.BaseQuery == nil {
-			return nil
-		}
-	}
 	ms.curParser = ms.cfg.BaseParser
 	err = ms.container.LoadBase(ms)
 	if ms.cfg.OnFinishBase != nil {
@@ -233,6 +234,12 @@ func (ms *MongoStreamer) loadBase2(context.Context) error {
 }
 
 func (ms *MongoStreamer) loadInc(ctx context.Context) error {
+	if ms.cfg.OnBeforeInc != nil {
+		ms.cfg.IncQuery = ms.cfg.OnBeforeInc(ms.cfg.UserData)
+		if ms.cfg.IncQuery == nil {
+			return nil
+		}
+	}
 	c, _ := context.WithTimeout(ctx, time.Duration(ms.cfg.ReadTimeout)*time.Microsecond)
 	cur, err := ms.collection.Find(nil, ms.cfg.IncQuery, ms.cfg.FindOpt)
 	if err != nil {
@@ -240,12 +247,6 @@ func (ms *MongoStreamer) loadInc(ctx context.Context) error {
 	}
 	if ms.cursor != nil {
 		_ = ms.cursor.Close(c)
-	}
-	if ms.cfg.OnBeforeInc != nil {
-		ms.cfg.IncQuery = ms.cfg.OnBeforeInc(ms.cfg.UserData)
-		if ms.cfg.IncQuery == nil {
-			return nil
-		}
 	}
 	ms.cursor = cur
 	ms.curParser = ms.cfg.IncParser
