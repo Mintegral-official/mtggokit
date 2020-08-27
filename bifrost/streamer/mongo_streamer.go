@@ -139,7 +139,6 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 	ms.lastBaseTime = time.Now()
 	if !ms.hasInit && ms.cfg.IsSync {
 		err := ms.loadBase(ctx)
-		ms.baseTimeUsed = time.Now().Sub(ms.lastBaseTime)
 		if err != nil {
 			ms.WarnStatus("LoadBase error:" + err.Error())
 		} else {
@@ -151,7 +150,6 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 		ms.lastBaseTime = time.Now()
 		if !ms.hasInit {
 			err := ms.loadBase(ctx)
-			ms.baseTimeUsed = time.Now().Sub(ms.lastBaseTime)
 			if err != nil {
 				ms.WarnStatus("LoadBase error:" + err.Error())
 			} else {
@@ -168,7 +166,6 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 			case <-inc:
 				ms.lastIncTime = time.Now()
 				err := ms.loadInc(ctx)
-				ms.incTimeUsed = time.Now().Sub(ms.lastIncTime)
 				if err != nil {
 					ms.WarnStatus("LoadInc Error:" + err.Error())
 				} else {
@@ -177,7 +174,6 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 			case <-base:
 				ms.lastBaseTime = time.Now()
 				err := ms.loadBase(ctx)
-				ms.baseTimeUsed = time.Now().Sub(ms.lastBaseTime)
 				if err != nil {
 					ms.WarnStatus("LoadBase Error:" + err.Error())
 				} else {
@@ -222,6 +218,7 @@ func (ms *MongoStreamer) loadBase2(context.Context) error {
 	ms.cursor = cur
 	ms.curParser = ms.cfg.BaseParser
 	err = ms.container.LoadBase(ms)
+	ms.baseTimeUsed = time.Now().Sub(ms.lastBaseTime)
 	if ms.cfg.OnFinishBase != nil {
 		ms.cfg.OnFinishBase(ms)
 	}
@@ -246,6 +243,7 @@ func (ms *MongoStreamer) loadInc(ctx context.Context) error {
 	ms.cursor = cur
 	ms.curParser = ms.cfg.IncParser
 	err = ms.container.LoadInc(ms)
+	ms.incTimeUsed = time.Now().Sub(ms.lastIncTime)
 	if ms.cfg.OnFinishInc != nil {
 		ms.cfg.OnFinishInc(ms)
 	}
