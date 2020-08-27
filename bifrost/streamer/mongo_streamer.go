@@ -158,13 +158,14 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 				ms.InfoStatus("LoadBase succ")
 			}
 		}
-
+		inc := time.Tick(time.Duration(ms.cfg.IncInterval) * time.Second)
+		base := time.Tick(time.Duration(ms.cfg.BaseInterval) * time.Second)
 		for {
 			select {
 			case <-ctx.Done():
 				ms.InfoStatus("LoadInc Finish:")
 				return
-			case <-time.Tick(time.Duration(ms.cfg.IncInterval) * time.Second):
+			case <-inc:
 				ms.lastIncTime = time.Now()
 				err := ms.loadInc(ctx)
 				ms.incTimeUsed = time.Now().Sub(ms.lastIncTime)
@@ -173,7 +174,7 @@ func (ms *MongoStreamer) UpdateData(ctx context.Context) error {
 				} else {
 					ms.InfoStatus("LoadInc Succ:")
 				}
-			case <-time.Tick(time.Duration(ms.cfg.BaseInterval) * time.Second):
+			case <-base:
 				ms.lastBaseTime = time.Now()
 				err := ms.loadBase(ctx)
 				ms.baseTimeUsed = time.Now().Sub(ms.lastBaseTime)
