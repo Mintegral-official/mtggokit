@@ -2,9 +2,9 @@ package bifrost
 
 import (
 	"errors"
-	"github.com/Mintegral-official/mtggokit/bifrost/container"
-	"github.com/Mintegral-official/mtggokit/bifrost/log"
-	"github.com/Mintegral-official/mtggokit/bifrost/streamer"
+	"github.com/lzexin/mtggokit/bifrost/container"
+	"github.com/lzexin/mtggokit/bifrost/log"
+	"github.com/lzexin/mtggokit/bifrost/streamer"
 )
 
 type Bifrost struct {

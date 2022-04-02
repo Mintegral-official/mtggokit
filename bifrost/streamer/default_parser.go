@@ -1,7 +1,7 @@
 package streamer
 
 import (
-	"github.com/Mintegral-official/mtggokit/bifrost/container"
+	"github.com/lzexin/mtggokit/bifrost/container"
 	"github.com/easierway/concurrent_map"
 	"strings"
 )

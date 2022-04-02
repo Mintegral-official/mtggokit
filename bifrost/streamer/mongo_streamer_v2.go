@@ -4,7 +4,7 @@ package streamer
 //import (
 //	"context"
 //	"fmt"
-//	"github.com/Mintegral-official/mtggokit/bifrost/container"
+//	"github.com/lzexin/mtggokit/bifrost/container"
 //	"errors"
 //	mgo "gopkg.in/mgo.v2"
 //	"gopkg.in/mgo.v2/bson"

@@ -1,6 +1,6 @@
 package conf
 
-import "github.com/Mintegral-official/mtggokit/bifrost/streamer"
+import "github.com/lzexin/mtggokit/bifrost/streamer"
 
 type StreamerConfig struct {
 	StreamerCfg *StreamerCfg `toml:"bifrost"`

@@ -1,7 +1,7 @@
 package streamer
 
 import (
-	"github.com/Mintegral-official/mtggokit/bifrost/log"
+	"github.com/lzexin/mtggokit/bifrost/log"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
